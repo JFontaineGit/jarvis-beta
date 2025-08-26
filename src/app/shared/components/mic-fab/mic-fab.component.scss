@@ -1,0 +1,304 @@
+@use '../../../../styles/mixins.scss' as *;
+@use '../../../../styles/variables.scss' as *;
+
+.mic-fab-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.manual-input-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.manual-input-modal {
+  background: var(--card);
+  @include glass(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+  animation: slideUp 0.3s ease;
+  
+  h3 {
+    margin: 0 0 16px 0;
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+    transition: all 0.3s ease;
+    
+    &:focus {
+      border-color: var(--accent-1);
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+    }
+    
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+  
+  .modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: flex-end;
+    
+    button {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      
+      &.btn-cancel {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-secondary);
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
+      }
+      
+      &.btn-send {
+        background: var(--accent-1);
+        color: white;
+        
+        &:hover:not(:disabled) {
+          background: lighten(#7c3aed, 10%);
+          transform: translateY(-1px);
+        }
+        
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+.fab-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.fab-button {
+  position: relative;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  outline: none;
+  overflow: hidden;
+  
+  svg {
+    stroke-width: 2;
+    transition: all 0.3s ease;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+  }
+  
+  &:not(:disabled):active {
+    transform: scale(0.95);
+  }
+}
+
+.secondary-fab {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  @include glass();
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-secondary);
+  
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+  
+  &:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.main-fab {
+  width: 72px;
+  height: 72px;
+  background: var(--accent-1);
+  color: white;
+  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+  
+  .mic-icon {
+    width: 28px;
+    height: 28px;
+    z-index: 2;
+  }
+  
+  .processing-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 2;
+  }
+  
+  .ripple {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent-2);
+    border-radius: 50%;
+    animation: rippleEffect 2s ease-out infinite;
+    
+    &.delay-1 {
+      animation-delay: 0.5s;
+    }
+    
+    &.delay-2 {
+      animation-delay: 1s;
+    }
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.5);
+  }
+  
+  &.listening {
+    background: var(--accent-2);
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.4);
+    animation: listeningPulse 1.5s ease-in-out infinite;
+    
+    .mic-icon {
+      animation: micGlow 2s ease-in-out infinite;
+    }
+    
+    &:hover:not(:disabled) {
+      box-shadow: 0 12px 40px rgba(6, 182, 212, 0.6);
+    }
+  }
+  
+  &.processing {
+    background: var(--text-muted);
+    animation: processingPulse 1s ease-in-out infinite;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rippleEffect {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes listeningPulse {
+  0%, 100% { transform: scale(1) translateY(-3px); }
+  50% { transform: scale(1.05) translateY(-3px); }
+}
+
+@keyframes processingPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+@keyframes micGlow {
+  0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+  50% { filter: drop-shadow(0 0 10px currentColor); }
+}
+
+// Responsive
+@include respond(mobile) {
+  .main-fab {
+    width: 64px;
+    height: 64px;
+    
+    .mic-icon {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  
+  .secondary-fab {
+    width: 44px;
+    height: 44px;
+    
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+  
+  .manual-input-modal {
+    padding: 20px;
+    margin: 20px;
+  }
+}

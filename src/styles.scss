@@ -1,1 +1,270 @@
-/* You can add global styles to this file, and also import other style files */
+// JARVIS Assistant Global Styles
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
+
+// CSS Reset and Base Styles
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+  background: #060615;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+// JARVIS Theme Class
+.jarvis-theme {
+  // CSS Variables are defined in variables.scss
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  color: var(--text-primary, rgba(255, 255, 255, 0.95));
+}
+
+p, span, div {
+  margin: 0;
+  color: var(--text-primary, rgba(255, 255, 255, 0.95));
+}
+
+// Form Elements
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+
+  &:focus {
+    outline: 2px solid var(--accent-1, #7c3aed);
+    outline-offset: 2px;
+  }
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Links
+a {
+  color: var(--accent-1, #7c3aed);
+  text-decoration: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--accent-2, #06b6d4);
+    text-decoration: underline;
+  }
+}
+
+// Selection
+::selection {
+  background: rgba(124, 58, 237, 0.3);
+  color: white;
+}
+
+::-moz-selection {
+  background: rgba(124, 58, 237, 0.3);
+  color: white;
+}
+
+// Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+
+  &-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  &-thumb {
+    background: rgba(124, 58, 237, 0.5);
+    border-radius: 4px;
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.7);
+    }
+  }
+}
+
+// Accessibility
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+// Focus indicators for keyboard navigation
+:focus-visible {
+  outline: 2px solid var(--accent-1, #7c3aed);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// Screen reader only
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Loading states
+.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+// Error states
+.error {
+  color: #ff6b6b !important;
+  border-color: rgba(255, 107, 107, 0.3) !important;
+}
+
+// Success states
+.success {
+  color: #51cf66 !important;
+  border-color: rgba(81, 207, 102, 0.3) !important;
+}
+
+// Warning states
+.warning {
+  color: #ffd43b !important;
+  border-color: rgba(255, 212, 59, 0.3) !important;
+}
+
+// Animations
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Utility Classes
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.d-none { display: none; }
+.d-block { display: block; }
+.d-flex { display: flex; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+
+.pointer-events-none { pointer-events: none; }
+.cursor-pointer { cursor: pointer; }
+.cursor-not-allowed { cursor: not-allowed; }
+
+// Spacing utilities
+.m-0 { margin: 0; }
+.p-0 { padding: 0; }
+.mt-auto { margin-top: auto; }
+.mb-auto { margin-bottom: auto; }
+.ml-auto { margin-left: auto; }
+.mr-auto { margin-right: auto; }
+
+// Border radius
+.rounded { border-radius: 8px; }
+.rounded-full { border-radius: 50%; }
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

@@ -1,0 +1,307 @@
+@use '../../../../styles/mixins.scss' as *;
+@use '../../../../styles/variables.scss' as *;
+
+.circle-container {
+  position: relative;
+  width: clamp(200px, 30vw, 400px);
+  height: clamp(200px, 30vw, 400px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  
+  .particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: var(--accent-2);
+    border-radius: 50%;
+    opacity: 0.2;
+    animation: particleFloat 8s linear infinite;
+    
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        left: random(100) * 1%;
+        top: random(100) * 1%;
+        animation-delay: random(8) * 1s;
+        animation-duration: (6 + random(4)) * 1s;
+        transform: scale(random(10) * 0.1 + 0.5);
+      }
+    }
+  }
+}
+
+.animated-circle {
+  position: relative;
+  width: clamp(180px, 25vw, 350px);
+  height: clamp(180px, 25vw, 350px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  
+  // Base glow effect
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(124, 58, 237, 0.1) 0%,
+      rgba(124, 58, 237, 0.05) 50%,
+      transparent 100%
+    );
+    transform: scale(1.2);
+    transition: all 0.3s ease;
+  }
+  
+  // Idle state
+  .circle-core {
+    width: 60%;
+    height: 60%;
+    border-radius: 50%;
+    background: var(--card);
+    @include glass(16px);
+    border: 1px solid rgba(124, 58, 237, 0.3);
+    position: relative;
+    transition: all 0.3s ease;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(
+        circle at 30% 30%,
+        rgba(124, 58, 237, 0.2) 0%,
+        transparent 70%
+      );
+      animation: coreGlow 4s ease-in-out infinite alternate;
+    }
+  }
+  
+  // Volume rings for listening state
+  .volume-ring {
+    position: absolute;
+    border: 2px solid var(--accent-2);
+    border-radius: 50%;
+    opacity: 0;
+    animation: volumeRipple 1.5s ease-out infinite;
+    
+    &.ring-1 {
+      width: 70%;
+      height: 70%;
+      animation-delay: 0s;
+    }
+    
+    &.ring-2 {
+      width: 85%;
+      height: 85%;
+      animation-delay: 0.3s;
+    }
+    
+    &.ring-3 {
+      width: 100%;
+      height: 100%;
+      animation-delay: 0.6s;
+    }
+  }
+  
+  // Speaking glow effect
+  .speaking-glow {
+    position: absolute;
+    width: 120%;
+    height: 120%;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      rgba(124, 58, 237, 0.3) 0%,
+      rgba(6, 182, 212, 0.2) 50%,
+      transparent 100%
+    );
+    animation: speakingPulse 2s ease-in-out infinite;
+    opacity: 0.8;
+  }
+  
+  // Center icon
+  .center-icon {
+    position: absolute;
+    width: 40%;
+    height: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    
+    .jarvis-logo {
+      width: 100%;
+      height: 100%;
+      color: var(--accent-1);
+      filter: drop-shadow(0 0 10px currentColor);
+      animation: logoFloat 3s ease-in-out infinite;
+    }
+  }
+  
+  // Listening state
+  &.listening {
+    .circle-core {
+      border-color: var(--accent-2);
+      background: rgba(6, 182, 212, 0.1);
+      box-shadow: 
+        inset 0 0 20px rgba(6, 182, 212, 0.2),
+        0 0 40px rgba(6, 182, 212, 0.3);
+      animation: listeningPulse 1.5s ease-in-out infinite;
+    }
+    
+    .jarvis-logo {
+      color: var(--accent-2);
+      animation: logoSpin 2s linear infinite, logoFloat 3s ease-in-out infinite;
+    }
+    
+    &::before {
+      background: radial-gradient(
+        circle,
+        rgba(6, 182, 212, 0.15) 0%,
+        rgba(6, 182, 212, 0.08) 50%,
+        transparent 100%
+      );
+      transform: scale(1.3);
+    }
+  }
+  
+  // Speaking state
+  &.speaking {
+    .circle-core {
+      border-color: var(--accent-1);
+      background: rgba(124, 58, 237, 0.15);
+      box-shadow: 
+        inset 0 0 30px rgba(124, 58, 237, 0.3),
+        0 0 60px rgba(124, 58, 237, 0.4);
+      animation: speakingPulse 2s ease-in-out infinite;
+    }
+    
+    .jarvis-logo {
+      color: var(--accent-1);
+      animation: logoGlow 2s ease-in-out infinite, logoFloat 3s ease-in-out infinite;
+    }
+    
+    &::before {
+      background: radial-gradient(
+        circle,
+        rgba(124, 58, 237, 0.2) 0%,
+        rgba(124, 58, 237, 0.1) 50%,
+        transparent 100%
+      );
+      transform: scale(1.4);
+      animation: speakingAura 2s ease-in-out infinite;
+    }
+  }
+  
+  // High volume enhancement
+  &.high-volume {
+    .volume-ring {
+      border-width: 3px;
+      opacity: 0.8;
+      animation-duration: 1s;
+    }
+    
+    .circle-core {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Animations
+@keyframes coreGlow {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.7; }
+}
+
+@keyframes volumeRipple {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+@keyframes listeningPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes speakingPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes speakingAura {
+  0%, 100% { transform: scale(1.4) rotate(0deg); }
+  50% { transform: scale(1.5) rotate(180deg); }
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(180deg); }
+}
+
+@keyframes logoSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px currentColor); }
+  50% { filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 30px currentColor); }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.2;
+  }
+  90% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(-20px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+// Responsive adjustments
+@include respond(mobile) {
+  .circle-container {
+    width: clamp(160px, 40vw, 280px);
+    height: clamp(160px, 40vw, 280px);
+  }
+  
+  .animated-circle {
+    width: clamp(140px, 35vw, 250px);
+    height: clamp(140px, 35vw, 250px);
+  }
+}

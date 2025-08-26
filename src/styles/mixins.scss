@@ -1,0 +1,301 @@
+@use './variables.scss' as *;
+
+// Responsive Breakpoints Mixin
+@mixin respond($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint `#{$breakpoint}`.";
+  }
+}
+
+// Respond Above Mixin
+@mixin respond-above($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: calc(map-get($breakpoints, $breakpoint) + 1px)) {
+      @content;
+    }
+  } @else {
+    @warn "Unknown breakpoint `#{$breakpoint}`.";
+  }
+}
+
+// Glassmorphism Effect
+@mixin glass($blur: $glass-blur, $opacity: $glass-opacity) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid $glass-border;
+}
+
+// Neon Text Glow Effect
+@mixin neon-text($color: var(--accent-1), $intensity: 1) {
+  color: $color;
+  text-shadow: 
+    0 0 5px rgba($color, 0.5 * $intensity),
+    0 0 10px rgba($color, 0.3 * $intensity),
+    0 0 20px rgba($color, 0.2 * $intensity);
+}
+
+// Neon Border Glow
+@mixin neon-border($color: var(--accent-1), $width: 1px, $intensity: 1) {
+  border: $width solid $color;
+  box-shadow: 
+    0 0 5px rgba($color, 0.4 * $intensity),
+    inset 0 0 5px rgba($color, 0.2 * $intensity);
+}
+
+// Neon Box Glow
+@mixin neon-glow($color: var(--accent-1), $intensity: 1) {
+  box-shadow: 
+    0 0 10px rgba($color, 0.3 * $intensity),
+    0 0 20px rgba($color, 0.2 * $intensity),
+    0 0 40px rgba($color, 0.1 * $intensity);
+}
+
+// Flexbox Utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Text Utilities
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-multiline-truncate($lines: 3) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Positioning Utilities
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// Button Utilities
+@mixin button-reset {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+@mixin button-hover($transform: translateY(-2px), $shadow: var(--shadow-md)) {
+  transition: all var(--transition-normal);
+  
+  &:hover {
+    transform: $transform;
+    box-shadow: $shadow;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Animation Utilities
+@mixin fade-in($duration: var(--transition-normal)) {
+  animation: fade-in $duration ease-out;
+}
+
+@mixin slide-up($duration: var(--transition-normal)) {
+  animation: slide-up $duration ease-out;
+}
+
+@mixin bounce-in($duration: 0.6s) {
+  animation: bounce-in $duration cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+// Scroll Utilities
+@mixin custom-scrollbar($track-color: rgba(255, 255, 255, 0.1), $thumb-color: var(--accent-1)) {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: 3px;
+    
+    &:hover {
+      background: lighten($thumb-color, 10%);
+    }
+  }
+}
+
+// Card Utilities
+@mixin card($padding: var(--space-md)) {
+  background: var(--card);
+  @include glass();
+  border-radius: var(--radius-lg);
+  padding: $padding;
+  transition: all var(--transition-normal);
+  
+  &:hover {
+    background: var(--card-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+// Focus Utilities
+@mixin focus-ring($color: var(--accent-1)) {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba($color, 0.3);
+  }
+}
+
+// Typography Scale
+@mixin heading($level: 1) {
+  $sizes: (
+    1: clamp(2rem, 5vw, 3.5rem),
+    2: clamp(1.75rem, 4vw, 2.5rem),
+    3: clamp(1.5rem, 3vw, 2rem),
+    4: clamp(1.25rem, 2.5vw, 1.5rem),
+    5: clamp(1.125rem, 2vw, 1.25rem),
+    6: clamp(1rem, 1.5vw, 1.125rem)
+  );
+  
+  font-size: map-get($sizes, $level);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+// Grid Utilities
+@mixin grid-auto-fit($min-size: 250px, $gap: var(--space-md)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-size, 1fr));
+  gap: $gap;
+}
+
+@mixin grid-auto-fill($min-size: 250px, $gap: var(--space-md)) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-size, 1fr));
+  gap: $gap;
+}
+
+// Loading Shimmer Effect
+@mixin shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+// Keyframe Animations
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { 
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Utility Functions
+@function z($layer) {
+  @if map-has-key($z-indexes, $layer) {
+    @return map-get($z-indexes, $layer);
+  } @else {
+    @warn "Unknown z-index layer `#{$layer}`.";
+    @return 0;
+  }
+}
+
+@function duration($speed) {
+  @if map-has-key($durations, $speed) {
+    @return map-get($durations, $speed);
+  } @else {
+    @warn "Unknown duration speed `#{$speed}`.";
+    @return 300ms;
+  }
+}
