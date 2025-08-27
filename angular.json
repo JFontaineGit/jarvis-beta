@@ -69,7 +69,10 @@
               "buildTarget": "JARVIS_ANGULAR:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {
+              "allowedHosts": ["all"]
+          }
         },
         "extract-i18n": {
           "builder": "@angular/build:extract-i18n"
@@ -92,5 +95,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

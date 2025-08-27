@@ -1,5 +1,6 @@
 @use '../../../../styles/mixins.scss' as *;
 @use '../../../../styles/variables.scss' as *;
+@use 'sass:color';
 
 .mic-fab-container {
   position: relative;
@@ -93,7 +94,7 @@
         color: white;
         
         &:hover:not(:disabled) {
-          background: lighten(#7c3aed, 10%);
+          background: color.adjust(#7c3aed, $lightness: 10%);
           transform: translateY(-1px);
         }
         
