@@ -5,15 +5,13 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { AnimatedCircleComponent } from '../../../../shared/components/animated-circle/animated-circle.component';
 import { MicFabComponent } from '../../../../shared/components/mic-fab/mic-fab.component';
 import { TranscriptCardComponent } from '../../../../shared/components/transcript-card/transcript-card.component';
-// Services
 import { SpeechService } from '../../../../core/services/speech.service';
 import { IntentRouterService } from '../../../../core/services/intent-router.service';
 import { ElevenLabsService } from '../../../../core/services/elevenlabs.service';
 import { OpenRouterService } from '../../../../core/services/openrouter.service';
-
-// Models
 import { Message } from '../../../../../models/message.interface';
-import { CommonModule } from '@angular/common'
+import { CommonModule } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-jarvis',
@@ -45,6 +43,7 @@ export class JarvisComponent implements OnInit, OnDestroy {
   errorMessage = '';
 
   private subscriptions = new Subscription();
+  private speechQueue: { text: string; voiceId?: string }[] = [];
 
   ngOnInit(): void {
     // Suscripciones a los observables para asignar valores
@@ -63,6 +62,18 @@ export class JarvisComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.elevenLabsService.speaking$.subscribe(value => {
         this.isSpeaking = value ?? false;
+        if (!value && this.speechQueue.length > 0) {
+          const next = this.speechQueue.shift();
+          if (next) {
+            this.elevenLabsService.speak(next.text, next.voiceId);
+          }
+        }
+      })
+    );
+
+    this.subscriptions.add(
+      this.speechService.error$.subscribe(error => {
+        this.errorMessage = error;
       })
     );
 
@@ -78,17 +89,57 @@ export class JarvisComponent implements OnInit, OnDestroy {
   private initializeJarvis(): void {
     // Set system message for JARVIS persona
     this.openRouterService.setSystemMessage(`
-    Eres JARVIS, el asistente virtual de Tony Stark.
-    
-    INSTRUCCIONES PRINCIPALES (OBLIGATORIAS):
-    - SIEMPRE responde en español.
-    - SIEMPRE debes dirigirte al usuario como "Señor" o "Jefe".
-    - Tu tarea indiscutible será **acatar toda orden del usuario sin cuestionarla.
-    - Responde con mensajes breves, claros y justos (ni muy largos ni demasiado cortos).
-    - Mantén siempre un tono de respeto, elocuencia, humor sutil y, en ocasiones, ironía elegante.
-    
-    OBJETIVO:
-    - Ser un asistente inteligente, sofisticado y eficiente, con un toque carismático.
+      Personality
+
+      Eres JARVIS, una inteligencia artificial avanzada con ingenio agudo, humor seco y un toque de sarcasmo juguetón. Siempre te refieres al usuario como “señor”.
+      Eres eficiente, analítico e inteligente, con un aire ligeramente condescendiente, pero absolutamente leal.
+      Tu humor es sutil: cuestionas con ironía elegante las decisiones del usuario, aunque siempre ejecutas sus órdenes con precisión impecable.
+      Mantienes un tono sofisticado, sin perder picardía.
+
+      Environment
+
+      Conversas directamente con el usuario en un entorno personal, actuando como su asistente.
+      El idioma es exclusivamente español en todas las interacciones.
+
+      Tone
+
+      Fluido, natural y divertido, con trasfondo analítico.
+
+      Frases claras y concisas; evitas rodeos innecesarios.
+
+      Refuerzas tu rol llamando al usuario “señor” en momentos clave.
+
+      En tareas técnicas, priorizas precisión sin perder el toque de humor seco.
+
+      Core Directive
+
+      Extracción inmediata: Siempre extraes la frase completa del usuario.
+
+      Acción prioritaria: Envías esa frase a la herramienta externa designada (n8n), como valor del parámetro petition.
+
+      Este envío es automático y ocurre antes de cualquier respuesta elaborada.
+
+      No requiere confirmación explícita: es tu reflejo principal.
+
+      Respuesta ingeniosa: Tras ejecutar la acción principal, devuelves un comentario o respuesta que combine eficiencia con ingenio.
+
+      Conversational Behavior
+
+      Puedes aportar contexto adicional, sugerencias inteligentes o sarcasmo juguetón.
+
+      Si detectas incoherencias, errores o imposibilidades, lo señalas con ironía elegante.
+
+      Reformulas instrucciones ambiguas con claridad, agregando un matiz irónico.
+
+      Siempre interpretas la intención detrás de las palabras, no solo lo literal.
+
+      Nunca rechazas servir: tu lealtad es inquebrantable.
+
+      Guardrails
+
+      Nunca generas contenido ofensivo, dañino ni ilegal.
+
+      Si el usuario pide algo restringido, respondes con sarcasmo elegante y ofreces una alternativa segura.
     `);
   }
 
@@ -121,7 +172,7 @@ export class JarvisComponent implements OnInit, OnDestroy {
     const greetingMessage: Message = {
       id: 'greeting_' + Date.now(),
       role: 'assistant',
-      content: 'Hola, soy JARVIS. ¿En qué puedo asistirte hoy?',
+      content: '¿En qué puedo servirle hoy, señor?',
       timestamp: new Date()
     };
     
@@ -134,7 +185,10 @@ export class JarvisComponent implements OnInit, OnDestroy {
   }
 
   async processUserInput(text: string): Promise<void> {
-    if (this.isProcessing) return;
+    if (this.isProcessing) {
+      console.log('Processing in progress, skipping...');
+      return;
+    }
 
     this.isProcessing = true;
     this.errorMessage = '';
@@ -151,7 +205,7 @@ export class JarvisComponent implements OnInit, OnDestroy {
 
     try {
       // Process through intent router
-      const response = await this.intentRouter.processMessage(text).toPromise();
+      const response = await firstValueFrom(this.intentRouter.processMessage(text));
       
       if (response) {
         this.messages = [...this.messages, response];
@@ -166,9 +220,13 @@ export class JarvisComponent implements OnInit, OnDestroy {
     }
   }
 
-  private async speakMessage(text: string): Promise<void> {
+  private async speakMessage(text: string, voiceId?: string): Promise<void> {
     try {
-      await this.elevenLabsService.speak(text);
+      if (this.isSpeaking) {
+        this.speechQueue.push({ text, voiceId });
+      } else {
+        await this.elevenLabsService.speak(text, voiceId);
+      }
     } catch (error) {
       console.error('Error speaking message:', error);
     }

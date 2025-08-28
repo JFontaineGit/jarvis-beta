@@ -1,7 +1,7 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, firstValueFrom } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { ElevenLabsRequest, VoiceSettings } from '../../../models/message.interface';
@@ -14,6 +14,7 @@ export class ElevenLabsService {
   private readonly baseUrl = 'https://api.elevenlabs.io/v1';
   private isSpeaking$ = new BehaviorSubject<boolean>(false);
   private audioContext: AudioContext | null = null;
+  private currentAudio: HTMLAudioElement | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -31,7 +32,7 @@ export class ElevenLabsService {
     }
 
     if (this.isSpeaking$.value) {
-      console.log('Already speaking, queuing...');
+      console.log('Already speaking, skipping new request...');
       return;
     }
 
@@ -54,15 +55,16 @@ export class ElevenLabsService {
         }
       };
 
-      const audioBlob = await this.apiService
-        .postForBlob(`${this.baseUrl}/text-to-speech/${voiceId}`, requestBody, headers)
-        .pipe(
-          catchError((error) => {
-            console.error('ElevenLabs TTS Error:', error.message || error);
-            return throwError(() => new Error(error.message || 'TTS API error'));
-          })
-        )
-        .toPromise();
+      const audioBlob = await firstValueFrom(
+        this.apiService
+          .postForBlob(`${this.baseUrl}/text-to-speech/${voiceId}`, requestBody, headers)
+          .pipe(
+            catchError((error) => {
+              console.error('ElevenLabs TTS Error:', error.message || error);
+              return throwError(() => new Error(error.message || 'TTS API error'));
+            })
+          )
+      );
 
       if (audioBlob) {
         await this.playAudioBlob(audioBlob);
@@ -83,20 +85,22 @@ export class ElevenLabsService {
     return new Promise((resolve, reject) => {
       try {
         const audioUrl = URL.createObjectURL(blob);
-        const audio = new Audio(audioUrl);
+        this.currentAudio = new Audio(audioUrl);
 
-        audio.onended = () => {
+        this.currentAudio.onended = () => {
           URL.revokeObjectURL(audioUrl);
+          this.currentAudio = null;
           resolve();
         };
 
-        audio.onerror = (error) => {
+        this.currentAudio.onerror = (error) => {
           URL.revokeObjectURL(audioUrl);
+          this.currentAudio = null;
           console.error('Audio playback error:', error);
           reject(new Error('Audio playback failed'));
         };
 
-        audio.play().catch((error) => {
+        this.currentAudio.play().catch((error) => {
           console.error('Error playing audio:', error);
           reject(error);
         });
@@ -123,9 +127,12 @@ export class ElevenLabsService {
       return;
     }
 
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.currentTime = 0;
+      this.currentAudio = null;
+    }
     this.isSpeaking$.next(false);
-    // Nota: Detener el audio requiere acceso al objeto Audio, que no se persiste actualmente
-    // Si necesitas detener el audio, considera almacenar la instancia de Audio
   }
 
   async getAvailableVoices(): Promise<any[]> {
@@ -135,15 +142,16 @@ export class ElevenLabsService {
       });
 
       return (
-        (await this.apiService
-          .get<any[]>(`${this.baseUrl}/voices`, headers)
-          .pipe(
-            catchError((error) => {
-              console.error('Error fetching voices:', error.message || error);
-              return throwError(() => new Error(error.message || 'Voices API error'));
-            })
-          )
-          .toPromise()) || []
+        (await firstValueFrom(
+          this.apiService
+            .get<any[]>(`${this.baseUrl}/voices`, headers)
+            .pipe(
+              catchError((error) => {
+                console.error('Error fetching voices:', error.message || error);
+                return throwError(() => new Error(error.message || 'Voices API error'));
+              })
+            )
+        )) || []
       );
     } catch (error: any) {
       console.error('Error in getAvailableVoices:', error.message || error);

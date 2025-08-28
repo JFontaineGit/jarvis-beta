@@ -2,30 +2,28 @@
 @use '../../../../styles/variables.scss' as *;
 
 .transcript-card {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 16px;
-  border-radius: 12px;
-  @include glass();
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-  animation: slideIn 0.4s ease-out;
+  @include flex-column-center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  @include holographic-glass();
+  border: 1px solid var(--glass-border);
+  transition: all var(--transition-normal);
+  animation: slideUp var(--transition-normal) ease-out;
   
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    border-color: rgba(255, 255, 255, 0.2);
+    @include float-card();
+    border-color: var(--glass-border-glow);
   }
   
   &.user {
-    background: rgba(124, 58, 237, 0.1);
-    border-color: rgba(124, 58, 237, 0.2);
-    margin-left: 20px;
+    background: rgba(var(--neon-primary), 0.1);
+    border-color: rgba(var(--neon-primary), 0.2);
+    margin-left: var(--space-md);
     
     .avatar {
-      background: var(--accent-1);
-      color: white;
+      background: var(--neon-primary);
+      color: var(--text-primary);
     }
     
     .message-content {
@@ -34,13 +32,13 @@
   }
   
   &.assistant {
-    background: rgba(6, 182, 212, 0.1);
-    border-color: rgba(6, 182, 212, 0.2);
-    margin-right: 20px;
+    background: rgba(var(--neon-secondary), 0.1);
+    border-color: rgba(var(--neon-secondary), 0.2);
+    margin-right: var(--space-md);
     
     .avatar {
-      background: var(--accent-2);
-      color: white;
+      background: var(--neon-secondary);
+      color: var(--text-primary);
     }
   }
   
@@ -50,22 +48,19 @@
   }
   
   &.latest {
-    animation: highlight 2s ease-out;
+    animation: pulseGlow duration('slow') ease-out;
   }
 }
 
 .message-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  @include flex-center;
+  gap: var(--space-sm);
   
   .avatar {
     width: 36px;
     height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: var(--radius-full);
+    @include flex-center;
     flex-shrink: 0;
     
     svg {
@@ -76,14 +71,14 @@
   }
   
   .message-info {
-    display: flex;
-    flex-direction: column;
+    @include flex-column-center;
     gap: 2px;
     
     .sender {
       font-size: 14px;
       font-weight: 600;
       color: var(--text-primary);
+      @include neon-glow(var(--text-primary), 'subtle');
     }
     
     .timestamp {
@@ -107,6 +102,7 @@
     strong, b {
       font-weight: 600;
       color: var(--text-primary);
+      @include neon-glow(var(--text-primary), 'subtle');
     }
     
     em, i {
@@ -115,11 +111,12 @@
     }
     
     code {
-      background: rgba(255, 255, 255, 0.1);
+      background: var(--glass-primary);
       padding: 2px 6px;
-      border-radius: 4px;
+      border-radius: var(--radius-sm);
       font-family: var(--font-mono);
       font-size: 0.9em;
+      @include neon-border(var(--neon-tertiary), 1px, 'subtle');
     }
   }
   
@@ -136,7 +133,7 @@
     font-size: 12px;
     color: var(--text-muted);
     font-style: italic;
-    animation: pulse 1.5s ease-in-out infinite;
+    animation: pulseGlow duration('slow') ease-in-out infinite;
   }
   
   .user & {
@@ -146,46 +143,17 @@
   }
 }
 
-// Animations
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes highlight {
-  0% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 10px rgba(124, 58, 237, 0.1);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.5; }
-  50% { opacity: 1; }
-}
-
 // Responsive
 @include respond(mobile) {
   .transcript-card {
-    padding: 12px;
+    padding: var(--space-sm);
     
     &.user {
-      margin-left: 10px;
+      margin-left: var(--space-sm);
     }
     
     &.assistant {
-      margin-right: 10px;
+      margin-right: var(--space-sm);
     }
   }
   

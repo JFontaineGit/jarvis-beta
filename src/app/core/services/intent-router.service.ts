@@ -25,16 +25,25 @@ export class IntentRouterService {
   }
 
   private detectIntent(message: string): string | null {
-    // Simple intent detection - can be expanded with ML models
-    const intents = {
-      'time': ['hora', 'tiempo', 'qué hora', 'que hora'],
-      'weather': ['clima', 'tiempo', 'temperatura', 'lluvia'],
-      'greeting': ['hola', 'buenos días', 'buenas tardes', 'buenas noches'],
-    };
+    // Enhanced intent detection with regex patterns
+    const intents = [
+      {
+        name: 'time',
+        patterns: [/hora\b/, /tiempo\b/, /qué hora es\b/, /que hora es\b/, /hora actual\b/]
+      },
+      {
+        name: 'weather',
+        patterns: [/clima\b/, /tiempo (en|para)\b/, /temperatura\b/, /lluvia\b/, /pronóstico\b/]
+      },
+      {
+        name: 'greeting',
+        patterns: [/hola\b/, /buenos días\b/, /buenas tardes\b/, /buenas noches\b/, /hey jarvis\b/]
+      }
+    ];
 
-    for (const [intent, keywords] of Object.entries(intents)) {
-      if (keywords.some(keyword => message.includes(keyword))) {
-        return intent;
+    for (const intent of intents) {
+      if (intent.patterns.some(pattern => pattern.test(message))) {
+        return intent.name;
       }
     }
 

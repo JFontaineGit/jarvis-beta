@@ -1,6 +1,10 @@
 @use './variables.scss' as *;
+@use 'sass:math';
 
-// Responsive Breakpoints Mixin
+// Import Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+// Responsive Breakpoints
 @mixin respond($breakpoint) {
   @if map-has-key($breakpoints, $breakpoint) {
     @media (max-width: map-get($breakpoints, $breakpoint)) {
@@ -11,7 +15,6 @@
   }
 }
 
-// Respond Above Mixin
 @mixin respond-above($breakpoint) {
   @if map-has-key($breakpoints, $breakpoint) {
     @media (min-width: calc(map-get($breakpoints, $breakpoint) + 1px)) {
@@ -22,40 +25,197 @@
   }
 }
 
-// Glassmorphism Effect
-@mixin glass($blur: $glass-blur, $opacity: $glass-opacity) {
-  background: rgba(255, 255, 255, $opacity);
-  backdrop-filter: blur($blur);
-  -webkit-backdrop-filter: blur($blur);
-  border: 1px solid $glass-border;
+// Holographic Glass Effects
+@mixin holographic-glass($intensity: 'normal') {
+  background: var(--glass-primary);
+  backdrop-filter: blur($holo-blur);
+  -webkit-backdrop-filter: blur($holo-blur);
+  border: 1px solid var(--glass-border);
+  
+  @if $intensity == 'strong' {
+    background: var(--glass-secondary);
+    border-color: var(--glass-border-glow);
+    box-shadow: 
+      0 0 20px rgba(0, 255, 255, 0.1),
+      inset 0 0 20px rgba(0, 255, 255, 0.05);
+  }
 }
 
-// Neon Text Glow Effect
-@mixin neon-text($color: var(--accent-1), $intensity: 1) {
+// Enhanced Neon Effects
+@mixin neon-glow($color: var(--neon-primary), $intensity: 'normal') {
+  $multiplier: map-get($neon-intensities, $intensity);
+  
   color: $color;
   text-shadow: 
-    0 0 5px rgba($color, 0.5 * $intensity),
-    0 0 10px rgba($color, 0.3 * $intensity),
-    0 0 20px rgba($color, 0.2 * $intensity);
+    0 0 5px rgba($color, 0.8 * $multiplier),
+    0 0 10px rgba($color, 0.6 * $multiplier),
+    0 0 20px rgba($color, 0.4 * $multiplier),
+    0 0 40px rgba($color, 0.2 * $multiplier);
 }
 
-// Neon Border Glow
-@mixin neon-border($color: var(--accent-1), $width: 1px, $intensity: 1) {
+@mixin neon-border($color: var(--neon-primary), $width: 1px, $intensity: 'normal') {
+  $multiplier: map-get($neon-intensities, $intensity);
+  
   border: $width solid $color;
   box-shadow: 
-    0 0 5px rgba($color, 0.4 * $intensity),
-    inset 0 0 5px rgba($color, 0.2 * $intensity);
+    0 0 10px rgba($color, 0.6 * $multiplier),
+    inset 0 0 10px rgba($color, 0.3 * $multiplier);
 }
 
-// Neon Box Glow
-@mixin neon-glow($color: var(--accent-1), $intensity: 1) {
+@mixin neon-box($color: var(--neon-primary), $intensity: 'normal') {
+  $multiplier: map-get($neon-intensities, $intensity);
+  
   box-shadow: 
-    0 0 10px rgba($color, 0.3 * $intensity),
-    0 0 20px rgba($color, 0.2 * $intensity),
-    0 0 40px rgba($color, 0.1 * $intensity);
+    0 0 10px rgba($color, 0.4 * $multiplier),
+    0 0 20px rgba($color, 0.3 * $multiplier),
+    0 0 40px rgba($color, 0.2 * $multiplier),
+    0 0 80px rgba($color, 0.1 * $multiplier);
 }
 
-// Flexbox Utilities
+// HUD Style Elements
+@mixin hud-panel($padding: var(--hud-padding)) {
+  @include holographic-glass('strong');
+  border-radius: var(--radius-hud);
+  padding: $padding;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      var(--neon-primary) 50%, 
+      transparent 100%
+    );
+    animation: scanLine 3s ease-in-out infinite;
+  }
+}
+
+// Floating Effect for Cards
+@mixin float-card($hover-lift: 8px) {
+  transition: all var(--transition-normal);
+  
+  &:hover {
+    transform: translateY(-$hover-lift);
+    box-shadow: 
+      0 #{$hover-lift * 2} #{$hover-lift * 4} rgba(0, 0, 0, 0.3),
+      0 0 #{$hover-lift * 3} rgba(0, 255, 255, 0.2);
+  }
+}
+
+// Holographic Button
+@mixin holo-button($type: 'primary') {
+  @include holographic-glass();
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-primary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  
+  @if $type == 'primary' {
+    @include neon-glow(var(--neon-primary));
+    @include neon-border(var(--neon-primary));
+  } @else if $type == 'secondary' {
+    @include neon-glow(var(--neon-secondary));
+    @include neon-border(var(--neon-secondary));
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.2), 
+      transparent
+    );
+    transition: left var(--transition-fast);
+  }
+  
+  &:hover::before {
+    left: 100%;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    @include neon-box(var(--neon-primary), 'strong');
+  }
+}
+
+// Particle Background
+@mixin particle-field($count: 50) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, var(--particle-color), transparent),
+      radial-gradient(2px 2px at 40px 70px, var(--particle-color), transparent),
+      radial-gradient(1px 1px at 90px 40px, var(--particle-color), transparent),
+      radial-gradient(1px 1px at 130px 80px, var(--particle-color), transparent),
+      radial-gradient(2px 2px at 160px 30px, var(--particle-color), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: particleMove 20s linear infinite;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+}
+
+// Scan Line Animation
+@mixin scan-lines($color: var(--neon-primary)) {
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      $color 50%, 
+      transparent 100%
+    );
+    animation: verticalScan 2s ease-in-out infinite;
+  }
+}
+
+// Circuit Board Pattern
+@mixin circuit-pattern($color: var(--neon-primary), $opacity: 0.1) {
+  background-image: 
+    linear-gradient(0deg, transparent 24%, $color 25%, $color 26%, transparent 27%, transparent 74%, $color 75%, $color 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, $color 25%, $color 26%, transparent 27%, transparent 74%, $color 75%, $color 76%, transparent 77%, transparent);
+  background-size: 20px 20px;
+  opacity: $opacity;
+}
+
+// Typing Animation
+@mixin typing-animation($steps: 20) {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps($steps, end), blink-caret 0.75s step-end infinite;
+}
+
+// Flex Utilities
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -68,217 +228,118 @@
   justify-content: space-between;
 }
 
-@mixin flex-column {
+@mixin flex-column-center {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-// Text Utilities
-@mixin text-truncate {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@mixin text-multiline-truncate($lines: 3) {
-  display: -webkit-box;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-// Positioning Utilities
-@mixin absolute-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-@mixin absolute-fill {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-// Button Utilities
-@mixin button-reset {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  outline: none;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-}
-
-@mixin button-hover($transform: translateY(-2px), $shadow: var(--shadow-md)) {
-  transition: all var(--transition-normal);
+// Grid Utilities
+@mixin hud-grid($columns: 3, $gap: var(--space-lg)) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
   
-  &:hover {
-    transform: $transform;
-    box-shadow: $shadow;
+  @include respond(tablet) {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  &:active {
-    transform: translateY(0);
+  @include respond(mobile) {
+    grid-template-columns: 1fr;
   }
 }
 
-// Animation Utilities
-@mixin fade-in($duration: var(--transition-normal)) {
-  animation: fade-in $duration ease-out;
-}
-
-@mixin slide-up($duration: var(--transition-normal)) {
-  animation: slide-up $duration ease-out;
-}
-
-@mixin bounce-in($duration: 0.6s) {
-  animation: bounce-in $duration cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-// Scroll Utilities
-@mixin custom-scrollbar($track-color: rgba(255, 255, 255, 0.1), $thumb-color: var(--accent-1)) {
+// Custom Scrollbar
+@mixin holo-scrollbar($width: 6px) {
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: $width;
+    height: $width;
   }
   
   &::-webkit-scrollbar-track {
-    background: $track-color;
-    border-radius: 3px;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: $width / 2;
   }
   
   &::-webkit-scrollbar-thumb {
-    background: $thumb-color;
-    border-radius: 3px;
+    background: var(--neon-primary);
+    border-radius: $width / 2;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     
     &:hover {
-      background: lighten($thumb-color, 10%);
+      background: var(--neon-secondary);
     }
   }
 }
 
-// Card Utilities
-@mixin card($padding: var(--space-md)) {
-  background: var(--card);
-  @include glass();
-  border-radius: var(--radius-lg);
-  padding: $padding;
-  transition: all var(--transition-normal);
-  
-  &:hover {
-    background: var(--card-hover);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+// Random particle generation using CSS calc
+@mixin generate-particles($count: 20) {
+  @for $i from 1 through $count {
+    &:nth-child(#{$i}) {
+      left: #{math.percentage(math.random())};
+      top: #{math.percentage(math.random())};
+      animation-delay: #{math.random() * 8}s;
+      animation-duration: #{6 + math.random() * 4}s;
+      transform: scale(#{0.5 + math.random() * 0.5});
+    }
   }
-}
-
-// Focus Utilities
-@mixin focus-ring($color: var(--accent-1)) {
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba($color, 0.3);
-  }
-}
-
-// Typography Scale
-@mixin heading($level: 1) {
-  $sizes: (
-    1: clamp(2rem, 5vw, 3.5rem),
-    2: clamp(1.75rem, 4vw, 2.5rem),
-    3: clamp(1.5rem, 3vw, 2rem),
-    4: clamp(1.25rem, 2.5vw, 1.5rem),
-    5: clamp(1.125rem, 2vw, 1.25rem),
-    6: clamp(1rem, 1.5vw, 1.125rem)
-  );
-  
-  font-size: map-get($sizes, $level);
-  font-weight: 600;
-  line-height: 1.2;
-  color: var(--text-primary);
-}
-
-// Grid Utilities
-@mixin grid-auto-fit($min-size: 250px, $gap: var(--space-md)) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($min-size, 1fr));
-  gap: $gap;
-}
-
-@mixin grid-auto-fill($min-size: 250px, $gap: var(--space-md)) {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax($min-size, 1fr));
-  gap: $gap;
-}
-
-// Loading Shimmer Effect
-@mixin shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
 }
 
 // Keyframe Animations
-@keyframes fade-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@keyframes scanLine {
+  0%, 100% { opacity: 0; transform: translateX(-100%); }
+  50% { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes slide-up {
-  from { 
-    opacity: 0;
-    transform: translateY(30px);
+@keyframes verticalScan {
+  0% { top: 0; opacity: 1; }
+  50% { top: 50%; opacity: 0.5; }
+  100% { top: 100%; opacity: 0; }
+}
+
+@keyframes particleMove {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-100px) translateX(100px); }
+}
+
+@keyframes holoFlicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes dataStream {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(-100%); }
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--neon-primary); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
   }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
+  50% { 
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
   }
 }
 
-@keyframes bounce-in {
-  0% {
-    opacity: 0;
-    transform: scale(0.3);
-  }
-  50% {
-    opacity: 1;
-  }
-  70% {
-    transform: scale(1.05);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
+@keyframes rotateHue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
+@keyframes matrixRain {
+  0% { transform: translateY(-100%); opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
 }
 
 // Utility Functions
@@ -296,6 +357,6 @@
     @return map-get($durations, $speed);
   } @else {
     @warn "Unknown duration speed `#{$speed}`.";
-    @return 300ms;
+    @return 400ms;
   }
 }

@@ -1,11 +1,12 @@
-// JARVIS Assistant Global Styles
+@use './styles/variables.scss' as *;
+@use './styles/mixins.scss' as *;
+
+// Import Google Fonts (de antiguas, para complementar si hace falta Inter/JetBrains)
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
-// CSS Reset and Base Styles
-*,
-*::before,
-*::after {
+// CSS Reset and Base Styles - De antiguas
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -19,98 +20,132 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.95);
-  background: #060615;
+  font-family: var(--font-secondary);
+  background: var(--bg-gradient);
+  color: var(--text-primary);
   min-height: 100vh;
   overflow-x: hidden;
-}
-
-// JARVIS Theme Class
-.jarvis-theme {
-  // CSS Variables are defined in variables.scss
-}
-
-// Typography
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.2;
-  margin: 0;
-  color: var(--text-primary, rgba(255, 255, 255, 0.95));
-}
-
-p, span, div {
-  margin: 0;
-  color: var(--text-primary, rgba(255, 255, 255, 0.95));
-}
-
-// Form Elements
-input, textarea, select {
-  font-family: inherit;
-  font-size: inherit;
-
-  &:focus {
-    outline: 2px solid var(--accent-1, #7c3aed);
-    outline-offset: 2px;
+  line-height: 1.6;
+  font-size: 16px; // De antiguas
+  
+  // Add subtle grain texture - De nuevas
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(0,255,255,0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+    pointer-events: none;
+    z-index: -1;
+    animation: particleMove 30s linear infinite;
   }
 }
 
-button {
-  font-family: inherit;
-  cursor: pointer;
+// Global Typography - Fusionado (nuevas con glow + antiguas)
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-primary);
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+  @include neon-glow(var(--text-primary), 'subtle');
+}
 
+h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 900; }
+h2 { font-size: clamp(1.5rem, 4vw, 2.5rem); font-weight: 700; }
+h3 { font-size: clamp(1.25rem, 3vw, 2rem); }
+h4 { font-size: clamp(1.125rem, 2.5vw, 1.5rem); }
+h5 { font-size: clamp(1rem, 2vw, 1.25rem); }
+h6 { font-size: clamp(0.875rem, 1.5vw, 1.125rem); }
+
+p, span, div {
+  margin-bottom: var(--space-md);
+  color: var(--text-secondary);
+}
+
+// Links - Fusionado
+a {
+  color: var(--neon-primary);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    @include neon-glow(var(--neon-primary), 'strong');
+    text-shadow: 0 0 10px currentColor;
+    text-decoration: underline; // De antiguas
+  }
+}
+
+// Form Elements - Fusionado
+input, textarea, select {
+  font-family: var(--font-secondary);
+  background: var(--glass-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-primary);
+  transition: all var(--transition-normal);
+  
+  &:focus {
+    outline: none;
+    border-color: var(--neon-primary);
+    @include neon-box(var(--neon-primary), 'subtle');
+  }
+  
+  &::placeholder {
+    color: var(--text-muted);
+  }
+}
+
+// Buttons - De nuevas, agregando disabled de antiguas
+button {
+  font-family: var(--font-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: var(--glass-primary);
+  color: var(--text-primary);
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
   &:disabled {
     cursor: not-allowed;
     opacity: 0.6;
   }
 }
 
-// Links
-a {
-  color: var(--accent-1, #7c3aed);
-  text-decoration: none;
-  transition: all 0.3s ease;
-
-  &:hover {
-    color: var(--accent-2, #06b6d4);
-    text-decoration: underline;
-  }
+// Custom Scrollbar - De nuevas (más holo)
+* {
+  @include holo-scrollbar();
 }
 
-// Selection
+// Selection - Fusionado (nuevas con rgba cyan)
 ::selection {
-  background: rgba(124, 58, 237, 0.3);
-  color: white;
+  background: rgba(0, 255, 255, 0.3);
+  color: var(--text-primary);
 }
 
 ::-moz-selection {
-  background: rgba(124, 58, 237, 0.3);
-  color: white;
+  background: rgba(0, 255, 255, 0.3);
+  color: var(--text-primary);
 }
 
-// Scrollbar
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-
-  &-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-  }
-
-  &-thumb {
-    background: rgba(124, 58, 237, 0.5);
-    border-radius: 4px;
-
-    &:hover {
-      background: rgba(124, 58, 237, 0.7);
-    }
-  }
+// Focus styles - De nuevas
+:focus-visible {
+  outline: 2px solid var(--neon-primary);
+  outline-offset: 2px;
+  border-radius: 4px; // De antiguas
 }
 
-// Accessibility
+// Accessibility - De antiguas
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -121,14 +156,7 @@ a {
   }
 }
 
-// Focus indicators for keyboard navigation
-:focus-visible {
-  outline: 2px solid var(--accent-1, #7c3aed);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-// Screen reader only
+// Screen reader only - De antiguas
 .sr-only {
   position: absolute;
   width: 1px;
@@ -141,46 +169,31 @@ a {
   border: 0;
 }
 
-// Loading states
+// Loading/Error/Success/Warning states - De antiguas
 .loading {
   pointer-events: none;
   opacity: 0.7;
 }
 
-// Error states
 .error {
-  color: #ff6b6b !important;
+  color: var(--neon-error) !important;
   border-color: rgba(255, 107, 107, 0.3) !important;
 }
 
-// Success states
 .success {
-  color: #51cf66 !important;
+  color: var(--success) !important;
   border-color: rgba(81, 207, 102, 0.3) !important;
 }
 
-// Warning states
 .warning {
-  color: #ffd43b !important;
+  color: var(--neon-warning) !important;
   border-color: rgba(255, 212, 59, 0.3) !important;
 }
 
-// Animations
-.fade-in {
-  animation: fadeIn 0.3s ease-out;
-}
-
-.slide-up {
-  animation: slideUp 0.4s ease-out;
-}
-
-.bounce-in {
-  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
+// Animations - Fusionadas (todas de ambas)
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideUp {
@@ -211,7 +224,29 @@ a {
   }
 }
 
-// Utility Classes
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+// Utility Classes - Fusionadas (todas de ambas)
+.fade-in { animation: fadeIn 0.3s ease-out; }
+.slide-up { animation: slideUp 0.4s ease-out; }
+.bounce-in { animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+.slide-in-left { animation: slideInLeft 0.6s ease-out; }
+.slide-in-right { animation: slideInRight 0.6s ease-out; }
+.scale-in { animation: scaleIn 0.6s ease-out; }
+
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -222,22 +257,9 @@ a {
 .d-inline { display: inline; }
 .d-inline-block { display: inline-block; }
 
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.flex-between {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.flex-column {
-  display: flex;
-  flex-direction: column;
-}
+.flex-center { @include flex-center; }
+.flex-between { @include flex-between; }
+.flex-column { @include flex-column-center; } // Ajustado a mixin
 
 .w-full { width: 100%; }
 .h-full { height: 100%; }
@@ -250,7 +272,6 @@ a {
 .cursor-pointer { cursor: pointer; }
 .cursor-not-allowed { cursor: not-allowed; }
 
-// Spacing utilities
 .m-0 { margin: 0; }
 .p-0 { padding: 0; }
 .mt-auto { margin-top: auto; }
@@ -258,13 +279,36 @@ a {
 .ml-auto { margin-left: auto; }
 .mr-auto { margin-right: auto; }
 
-// Border radius
-.rounded { border-radius: 8px; }
-.rounded-full { border-radius: 50%; }
+.rounded { border-radius: var(--radius-md); }
+.rounded-full { border-radius: var(--radius-full); }
 
-// Print styles
+.text-glow { @include neon-glow(); }
+.text-glow-strong { @include neon-glow(var(--neon-primary), 'strong'); }
+
+.glass-panel { @include holographic-glass(); }
+.hud-panel { @include hud-panel(); }
+
+// Responsive utilities - De nuevas
+.mobile-only {
+  @include respond-above(mobile) {
+    display: none;
+  }
+}
+
+.desktop-only {
+  @include respond(mobile) {
+    display: none;
+  }
+}
+
+// Print styles - De antiguas
 @media print {
   .no-print {
     display: none !important;
   }
+}
+
+// JARVIS Theme Class - De antiguas
+.jarvis-theme {
+  // CSS Variables are defined in variables.scss
 }

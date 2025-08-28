@@ -2,15 +2,15 @@
 @use '../../../../styles/variables.scss' as *;
 
 .circle-container {
+  @include flex-center;
   position: relative;
   width: clamp(200px, 30vw, 400px);
   height: clamp(200px, 30vw, 400px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include circuit-pattern(var(--neon-tertiary), 0.05); // Agrego patrón de circuito para vibe futurista
 }
 
 .particles {
+  @include particle-field(20); // Usando mixin para campo de partículas
   position: absolute;
   top: 0;
   left: 0;
@@ -22,32 +22,22 @@
     position: absolute;
     width: 3px;
     height: 3px;
-    background: var(--accent-2);
-    border-radius: 50%;
+    background: var(--particle-color);
+    border-radius: var(--radius-full);
     opacity: 0.2;
-    animation: particleFloat 8s linear infinite;
+    animation: particleMove duration('slow') linear infinite;
     
-    @for $i from 1 through 20 {
-      &:nth-child(#{$i}) {
-        left: random(100) * 1%;
-        top: random(100) * 1%;
-        animation-delay: random(8) * 1s;
-        animation-duration: (6 + random(4)) * 1s;
-        transform: scale(random(10) * 0.1 + 0.5);
-      }
-    }
+    @include generate-particles(20); // Generación random con math
   }
 }
 
 .animated-circle {
+  @include flex-center;
   position: relative;
   width: clamp(180px, 25vw, 350px);
   height: clamp(180px, 25vw, 350px);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-normal);
   
   // Base glow effect
   &::before {
@@ -55,50 +45,49 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: radial-gradient(
       circle,
-      rgba(124, 58, 237, 0.1) 0%,
-      rgba(124, 58, 237, 0.05) 50%,
+      rgba(var(--neon-primary), 0.1) 0%,
+      rgba(var(--neon-primary), 0.05) 50%,
       transparent 100%
     );
     transform: scale(1.2);
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
   }
   
-  // Idle state
+  // Core circle con glass holográfico
   .circle-core {
+    @include holographic-glass('strong');
     width: 60%;
     height: 60%;
-    border-radius: 50%;
-    background: var(--card);
-    @include glass(16px);
-    border: 1px solid rgba(124, 58, 237, 0.3);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--neon-primary);
     position: relative;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
     
     &::before {
       content: '';
       position: absolute;
       width: 100%;
       height: 100%;
-      border-radius: 50%;
+      border-radius: var(--radius-full);
       background: radial-gradient(
         circle at 30% 30%,
-        rgba(124, 58, 237, 0.2) 0%,
+        rgba(var(--neon-primary), 0.2) 0%,
         transparent 70%
       );
-      animation: coreGlow 4s ease-in-out infinite alternate;
+      animation: pulseGlow duration('slow') ease-in-out infinite alternate;
     }
   }
   
-  // Volume rings for listening state
+  // Volume rings para listening con neon-border
   .volume-ring {
+    @include neon-border(var(--neon-secondary), 2px, 'normal');
     position: absolute;
-    border: 2px solid var(--accent-2);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     opacity: 0;
-    animation: volumeRipple 1.5s ease-out infinite;
+    animation: matrixRain duration('fast') ease-out infinite;
     
     &.ring-1 {
       width: 70%;
@@ -119,93 +108,90 @@
     }
   }
   
-  // Speaking glow effect
+  // Speaking glow con neon-box
   .speaking-glow {
+    @include neon-box(var(--neon-primary), 'strong');
     position: absolute;
     width: 120%;
     height: 120%;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background: radial-gradient(
       circle,
-      rgba(124, 58, 237, 0.3) 0%,
-      rgba(6, 182, 212, 0.2) 50%,
+      rgba(var(--neon-primary), 0.3) 0%,
+      rgba(var(--neon-secondary), 0.2) 50%,
       transparent 100%
     );
-    animation: speakingPulse 2s ease-in-out infinite;
+    animation: rotateHue duration('normal') ease-in-out infinite;
     opacity: 0.8;
   }
   
-  // Center icon
+  // Center icon con neon-glow
   .center-icon {
+    @include flex-center;
     position: absolute;
     width: 40%;
     height: 40%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
+    z-index: z('content');
     
     .jarvis-logo {
       width: 100%;
       height: 100%;
-      color: var(--accent-1);
-      filter: drop-shadow(0 0 10px currentColor);
-      animation: logoFloat 3s ease-in-out infinite;
+      color: var(--neon-primary);
+      @include neon-glow(var(--neon-primary), 'normal');
+      animation: dataStream duration('slow') ease-in-out infinite;
     }
   }
   
-  // Listening state
+  // Listening state mejorado
   &.listening {
+    @include scan-lines(var(--neon-secondary)); // Agrego scan lines para efecto insano
     .circle-core {
-      border-color: var(--accent-2);
-      background: rgba(6, 182, 212, 0.1);
-      box-shadow: 
-        inset 0 0 20px rgba(6, 182, 212, 0.2),
-        0 0 40px rgba(6, 182, 212, 0.3);
-      animation: listeningPulse 1.5s ease-in-out infinite;
+      border-color: var(--neon-secondary);
+      background: rgba(var(--neon-secondary), 0.1);
+      @include neon-box(var(--neon-secondary), 'strong');
+      animation: pulseGlow duration('slow') ease-in-out infinite;
     }
     
     .jarvis-logo {
-      color: var(--accent-2);
-      animation: logoSpin 2s linear infinite, logoFloat 3s ease-in-out infinite;
+      color: var(--neon-secondary);
+      animation: rotateHue duration('normal') linear infinite, dataStream duration('slow') ease-in-out infinite;
     }
     
     &::before {
       background: radial-gradient(
         circle,
-        rgba(6, 182, 212, 0.15) 0%,
-        rgba(6, 182, 212, 0.08) 50%,
+        rgba(var(--neon-secondary), 0.15) 0%,
+        rgba(var(--neon-secondary), 0.08) 50%,
         transparent 100%
       );
       transform: scale(1.3);
     }
   }
   
-  // Speaking state
+  // Speaking state mejorado
   &.speaking {
+    @include scan-lines(var(--neon-primary)); // Scan lines para futurista
     .circle-core {
-      border-color: var(--accent-1);
-      background: rgba(124, 58, 237, 0.15);
-      box-shadow: 
-        inset 0 0 30px rgba(124, 58, 237, 0.3),
-        0 0 60px rgba(124, 58, 237, 0.4);
-      animation: speakingPulse 2s ease-in-out infinite;
+      border-color: var(--neon-primary);
+      background: rgba(var(--neon-primary), 0.15);
+      @include neon-box(var(--neon-primary), 'extreme');
+      animation: holoFlicker duration('normal') ease-in-out infinite;
     }
     
     .jarvis-logo {
-      color: var(--accent-1);
-      animation: logoGlow 2s ease-in-out infinite, logoFloat 3s ease-in-out infinite;
+      color: var(--neon-primary);
+      animation: pulseGlow duration('normal') ease-in-out infinite, dataStream duration('slow') ease-in-out infinite;
     }
     
     &::before {
       background: radial-gradient(
         circle,
-        rgba(124, 58, 237, 0.2) 0%,
-        rgba(124, 58, 237, 0.1) 50%,
+        rgba(var(--neon-primary), 0.2) 0%,
+        rgba(var(--neon-primary), 0.1) 50%,
         transparent 100%
       );
       transform: scale(1.4);
-      animation: speakingAura 2s ease-in-out infinite;
+      animation: rotateHue duration('normal') ease-in-out infinite;
     }
   }
   
@@ -214,82 +200,12 @@
     .volume-ring {
       border-width: 3px;
       opacity: 0.8;
-      animation-duration: 1s;
+      animation-duration: duration('fast');
     }
     
     .circle-core {
       transform: scale(1.05);
     }
-  }
-}
-
-// Animations
-@keyframes coreGlow {
-  0% { opacity: 0.3; }
-  100% { opacity: 0.7; }
-}
-
-@keyframes volumeRipple {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.2);
-    opacity: 0;
-  }
-}
-
-@keyframes listeningPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
-}
-
-@keyframes speakingPulse {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.03);
-    opacity: 1;
-  }
-}
-
-@keyframes speakingAura {
-  0%, 100% { transform: scale(1.4) rotate(0deg); }
-  50% { transform: scale(1.5) rotate(180deg); }
-}
-
-@keyframes logoFloat {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-3px) rotate(180deg); }
-}
-
-@keyframes logoSpin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes logoGlow {
-  0%, 100% { filter: drop-shadow(0 0 10px currentColor); }
-  50% { filter: drop-shadow(0 0 20px currentColor) drop-shadow(0 0 30px currentColor); }
-}
-
-@keyframes particleFloat {
-  0% {
-    transform: translateY(0px) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.2;
-  }
-  90% {
-    opacity: 0.2;
-  }
-  100% {
-    transform: translateY(-20px) rotate(360deg);
-    opacity: 0;
   }
 }
 

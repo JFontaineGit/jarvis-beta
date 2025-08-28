@@ -1,9 +1,9 @@
 export const environment = {
   production: false,
   openRouterKeys: [
-    "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",
+    "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",
   ],
-  elevenLabsKey: "sk_086c6500b25b78573759bd5ecf715d38522ff039fdedecbe",
+  elevenLabsKey: "sk_a9add047fa19833fd48b4db4449209a9424b433dbf3d325b",
   defaultVoiceId: "LruHrtVF6PSyGItzMNHS", 
   openRouterModel: "openai/gpt-3.5-turbo"
 };

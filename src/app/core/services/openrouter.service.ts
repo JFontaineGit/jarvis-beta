@@ -13,6 +13,7 @@ export class OpenRouterService {
   private readonly baseUrl = 'https://openrouter.ai/api/v1';
   private currentKeyIndex = 0;
   private conversationHistory: Message[] = [];
+  private readonly maxHistoryLength = 20; // Limit to last 20 messages (excluding system)
 
   constructor(private apiService: ApiService) {}
 
@@ -24,14 +25,11 @@ export class OpenRouterService {
       timestamp: new Date()
     };
 
-    this.conversationHistory.push(userMessage);
+    this.addToHistory(userMessage);
 
     const requestBody = {
       model: environment.openRouterModel,
-      messages: this.conversationHistory.map(msg => ({
-        role: msg.role,
-        content: msg.content
-      })),
+      messages: this.getPreparedHistory(),
       temperature: 0.7,
       max_tokens: 800
     };
@@ -45,7 +43,7 @@ export class OpenRouterService {
           timestamp: new Date()
         };
 
-        this.conversationHistory.push(assistantMessage);
+        this.addToHistory(assistantMessage);
         return [assistantMessage];
       }),
       catchError(error => {
@@ -85,7 +83,7 @@ export class OpenRouterService {
   }
 
   clearConversation(): void {
-    this.conversationHistory = [];
+    this.conversationHistory = this.conversationHistory.filter(msg => msg.role === 'system');
   }
 
   getConversationHistory(): Message[] {
@@ -105,5 +103,25 @@ export class OpenRouterService {
     };
     
     this.conversationHistory = [systemMessage, ...this.conversationHistory.filter(msg => msg.role !== 'system')];
+  }
+
+  private addToHistory(message: Message): void {
+    this.conversationHistory.push(message);
+    // Keep system + last maxHistoryLength messages
+    const systemMessages = this.conversationHistory.filter(msg => msg.role === 'system');
+    const nonSystemMessages = this.conversationHistory.filter(msg => msg.role !== 'system');
+    if (nonSystemMessages.length > this.maxHistoryLength) {
+      this.conversationHistory = [
+        ...systemMessages,
+        ...nonSystemMessages.slice(-this.maxHistoryLength)
+      ];
+    }
+  }
+
+  private getPreparedHistory(): { role: string; content: string }[] {
+    return this.conversationHistory.map(msg => ({
+      role: msg.role,
+      content: msg.content
+    }));
   }
 }

@@ -12,6 +12,7 @@ export class SpeechService {
   private interimTranscript$ = new Subject<string>();
   private finalTranscript$ = new Subject<string>();
   private volumeLevel$ = new BehaviorSubject<number>(0);
+  private error = new Subject<string>();
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private microphone: MediaStreamAudioSourceNode | null = null;
@@ -40,6 +41,10 @@ export class SpeechService {
     return this.volumeLevel$.asObservable();
   }
 
+  get error$(): Observable<string> {
+    return this.error.asObservable();
+  }
+
   private initializeSpeechRecognition(): void {
     if (!isPlatformBrowser(this.platformId)) {
       console.warn('Speech Recognition not supported on server');
@@ -48,6 +53,7 @@ export class SpeechService {
 
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
       console.warn('Speech Recognition not supported in this browser');
+      this.error.next('Reconocimiento de voz no soportado en este navegador.');
       return;
     }
 
@@ -69,6 +75,15 @@ export class SpeechService {
 
     this.recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event.error);
+      let errorMsg = 'Error en el reconocimiento de voz.';
+      if (event.error === 'no-speech') {
+        errorMsg = 'No se detectó voz. Intenta hablar más claro.';
+      } else if (event.error === 'audio-capture') {
+        errorMsg = 'No se detectó micrófono. Verifique permisos.';
+      } else if (event.error === 'not-allowed') {
+        errorMsg = 'Permiso para micrófono denegado. Verifique configuración.';
+      }
+      this.error.next(errorMsg);
       this.isListening$.next(false);
       this.stopVolumeAnalysis();
     };
@@ -103,7 +118,7 @@ export class SpeechService {
     }
 
     if (!this.recognition) {
-      console.error('Speech Recognition not available');
+      this.error.next('Reconocimiento de voz no disponible.');
       return;
     }
 
@@ -111,6 +126,7 @@ export class SpeechService {
       this.recognition.start();
     } catch (error) {
       console.error('Error starting speech recognition:', error);
+      this.error.next('Error al iniciar el reconocimiento de voz. Verifique permisos de micrófono.');
     }
   }
 
@@ -153,6 +169,7 @@ export class SpeechService {
       this.updateVolume();
     } catch (error) {
       console.error('Error accessing microphone:', error);
+      this.error.next('No se detectó micrófono. Verifique permisos.');
     }
   }
 

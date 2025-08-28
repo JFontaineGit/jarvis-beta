@@ -1,13 +1,10 @@
 @use '../../../../styles/mixins.scss' as *;
 @use '../../../../styles/variables.scss' as *;
-@use 'sass:color';
 
 .mic-fab-container {
+  @include flex-column-center;
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  gap: var(--space-md);
 }
 
 .manual-input-overlay {
@@ -17,47 +14,44 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease;
+  @include flex-center;
+  z-index: z('modal');
+  animation: fadeIn var(--transition-fast) ease;
 }
 
 .manual-input-modal {
-  background: var(--card);
-  @include glass(20px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 24px;
+  @include holographic-glass('strong');
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
   width: 90%;
   max-width: 400px;
-  animation: slideUp 0.3s ease;
+  animation: slideUp var(--transition-normal) ease;
   
   h3 {
-    margin: 0 0 16px 0;
+    margin: 0 0 var(--space-md) 0;
     color: var(--text-primary);
     font-size: 18px;
     font-weight: 600;
+    @include neon-glow(var(--text-primary), 'subtle');
   }
   
   textarea {
     width: 100%;
     min-height: 80px;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: var(--space-sm);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    background: var(--glass-primary);
     color: var(--text-primary);
     font-family: inherit;
     font-size: 14px;
     resize: vertical;
     outline: none;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
     
     &:focus {
-      border-color: var(--accent-1);
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+      border-color: var(--neon-primary);
+      @include neon-box(var(--neon-primary), 'subtle');
     }
     
     &::placeholder {
@@ -66,36 +60,21 @@
   }
   
   .modal-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
+    @include flex-between;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
     justify-content: flex-end;
     
     button {
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
+      @include holo-button('primary'); // Usando mixin para botón holográfico
       
       &.btn-cancel {
-        background: rgba(255, 255, 255, 0.1);
-        color: var(--text-secondary);
-        
-        &:hover {
-          background: rgba(255, 255, 255, 0.15);
-        }
+        @include holo-button('secondary');
       }
       
       &.btn-send {
-        background: var(--accent-1);
-        color: white;
-        
         &:hover:not(:disabled) {
-          background: color.adjust(#7c3aed, $lightness: 10%);
-          transform: translateY(-1px);
+          @include neon-box(var(--neon-primary), 'strong');
         }
         
         &:disabled {
@@ -108,27 +87,23 @@
 }
 
 .fab-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
+  @include flex-column-center;
+  gap: var(--space-sm);
 }
 
 .fab-button {
   position: relative;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
+  @include flex-center;
+  transition: all var(--transition-normal);
   outline: none;
   overflow: hidden;
   
   svg {
     stroke-width: 2;
-    transition: all 0.3s ease;
+    transition: all var(--transition-normal);
   }
   
   &:disabled {
@@ -145,9 +120,8 @@
 .secondary-fab {
   width: 48px;
   height: 48px;
-  background: rgba(255, 255, 255, 0.1);
-  @include glass();
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  @include holographic-glass();
+  border: 1px solid var(--glass-border);
   color: var(--text-secondary);
   
   svg {
@@ -156,43 +130,41 @@
   }
   
   &:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.15);
+    @include float-card(2px);
     color: var(--text-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   }
 }
 
 .main-fab {
   width: 72px;
   height: 72px;
-  background: var(--accent-1);
-  color: white;
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+  background: var(--neon-primary);
+  color: var(--text-primary);
+  @include neon-box(var(--neon-primary), 'normal');
   
   .mic-icon {
     width: 28px;
     height: 28px;
-    z-index: 2;
+    z-index: z('base');
   }
   
   .processing-spinner {
     width: 24px;
     height: 24px;
     border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    z-index: 2;
+    border-top: 2px solid var(--text-primary);
+    border-radius: var(--radius-full);
+    animation: rotateHue duration('normal') linear infinite;
+    z-index: z('base');
   }
   
   .ripple {
     position: absolute;
     width: 100%;
     height: 100%;
-    border: 2px solid var(--accent-2);
-    border-radius: 50%;
-    animation: rippleEffect 2s ease-out infinite;
+    border: 2px solid var(--neon-secondary);
+    border-radius: var(--radius-full);
+    animation: pulseGlow duration('slow') ease-out infinite;
     
     &.delay-1 {
       animation-delay: 0.5s;
@@ -204,76 +176,28 @@
   }
   
   &:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(124, 58, 237, 0.5);
+    @include float-card(3px);
+    @include neon-box(var(--neon-primary), 'strong');
   }
   
   &.listening {
-    background: var(--accent-2);
-    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.4);
-    animation: listeningPulse 1.5s ease-in-out infinite;
+    background: var(--neon-secondary);
+    @include neon-box(var(--neon-secondary), 'normal');
+    animation: pulseGlow duration('slow') ease-in-out infinite;
     
     .mic-icon {
-      animation: micGlow 2s ease-in-out infinite;
+      animation: holoFlicker duration('normal') ease-in-out infinite;
     }
     
     &:hover:not(:disabled) {
-      box-shadow: 0 12px 40px rgba(6, 182, 212, 0.6);
+      @include neon-box(var(--neon-secondary), 'strong');
     }
   }
   
   &.processing {
     background: var(--text-muted);
-    animation: processingPulse 1s ease-in-out infinite;
+    animation: holoFlicker duration('fast') ease-in-out infinite;
   }
-}
-
-// Animations
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes rippleEffect {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(1.8);
-    opacity: 0;
-  }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes listeningPulse {
-  0%, 100% { transform: scale(1) translateY(-3px); }
-  50% { transform: scale(1.05) translateY(-3px); }
-}
-
-@keyframes processingPulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-@keyframes micGlow {
-  0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
-  50% { filter: drop-shadow(0 0 10px currentColor); }
 }
 
 // Responsive
@@ -299,7 +223,7 @@
   }
   
   .manual-input-modal {
-    padding: 20px;
-    margin: 20px;
+    padding: var(--space-md);
+    margin: var(--space-md);
   }
 }

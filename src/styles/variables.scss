@@ -1,93 +1,168 @@
-// JARVIS Theme Variables
+@use 'sass:math';
+@use 'sass:map';
+
+// Import Google Fonts (de las nuevas, más completas)
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+// :root combinado
 :root {
-  // Background Colors
-  --bg-primary: #060615;
-  --bg-secondary: #0a0b1a;
-  --bg-tertiary: #0f1121;
+  // Background Colors - De las nuevas (cyberpunk gradients)
+  --bg-primary: #000510;
+  --bg-secondary: #001122;
+  --bg-tertiary: #002240;
+  --bg-gradient: linear-gradient(135deg, #000510 0%, #001122 50%, #002240 100%);
   
-  // Card & Surface Colors
+  // Background Colors legacy de las antiguas para no perder
+  --legacy-bg-primary: #060615;
+  --legacy-bg-secondary: #0a0b1a;
+  --legacy-bg-tertiary: #0f1121;
+  
+  // Holographic Glass Colors - De las nuevas
+  --glass-primary: rgba(0, 255, 255, 0.08);
+  --glass-secondary: rgba(0, 150, 255, 0.06);
+  --glass-border: rgba(0, 255, 255, 0.2);
+  --glass-border-glow: rgba(0, 255, 255, 0.4);
+  
+  // Card & Surface Colors - De las antiguas (agregadas como únicas)
   --card: rgba(255, 255, 255, 0.05);
   --card-hover: rgba(255, 255, 255, 0.08);
   --card-active: rgba(255, 255, 255, 0.12);
   
-  // Accent Colors
+  // Neon Accent Colors - De las nuevas
+  --neon-primary: #00FFFF;    // Electric Cyan
+  --neon-secondary: #0099FF;  // Electric Blue  
+  --neon-tertiary: #66CCFF;   // Light Blue
+  --neon-accent: #00FF88;     // Electric Green
+  --neon-warning: #FFAA00;    // Electric Orange
+  --neon-error: #FF3366;      // Electric Red
+  
+  // Accent Colors legacy de las antiguas (agregadas como --accent-*)
   --accent-1: #7c3aed; // Neon Purple
   --accent-2: #06b6d4; // Cyan
   --accent-3: #f59e0b; // Amber
   
-  // Text Colors
-  --text-primary: rgba(255, 255, 255, 0.95);
-  --text-secondary: rgba(255, 255, 255, 0.75);
-  --text-muted: rgba(255, 255, 255, 0.5);
+  // Text Colors with Glow - De las nuevas
+  --text-primary: #FFFFFF;
+  --text-secondary: #CCFFFF;
+  --text-muted: #66AACC;
+  --text-glow: #00FFFF;
   
-  // State Colors
+  // Text Colors legacy de las antiguas (agregadas como --legacy-text-*)
+  --legacy-text-primary: rgba(255, 255, 255, 0.95);
+  --legacy-text-secondary: rgba(255, 255, 255, 0.75);
+  --legacy-text-muted: rgba(255, 255, 255, 0.5);
+  
+  // State Colors - De las antiguas (agregadas, ya que nuevas tienen neon equivalents pero no idénticos)
   --success: #10b981;
   --warning: #f59e0b;
   --error: #ef4444;
   --info: --accent-2;
   
-  // Typography
-  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  // HUD Elements - De las nuevas
+  --hud-border: rgba(0, 255, 255, 0.3);
+  --hud-fill: rgba(0, 255, 255, 0.1);
+  --hud-glow: 0 0 20px rgba(0, 255, 255, 0.5);
   
-  // Spacing
+  // Typography - De las nuevas (más futuristas), agregando legacy
+  --font-primary: 'Orbitron', 'Exo 2', 'Rajdhani', monospace;
+  --font-secondary: 'Exo 2', 'Rajdhani', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --legacy-font-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  --legacy-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  
+  // Spacing - De ambas (iguales, uso nuevas con extras)
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 16px;
   --space-lg: 24px;
   --space-xl: 32px;
   --space-2xl: 48px;
+  --space-3xl: 64px;
   
-  // Border Radius
+  // Border Radius - De las nuevas con extras de antiguas
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-full: 50%;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-hud: 2px;
+  --radius-full: 50%; // De antiguas
   
-  // Shadows
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.25);
+  // Shadows - De las nuevas, agregando legacy
+  --shadow-neon: 0 0 20px rgba(0, 255, 255, 0.3);
+  --shadow-deep: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 16px 48px rgba(0, 255, 255, 0.1);
+  --shadow-glow: 0 0 40px rgba(0, 255, 255, 0.2);
+  --legacy-shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --legacy-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --legacy-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.2);
+  --legacy-shadow-xl: 0 16px 40px rgba(0, 0, 0, 0.25);
   
-  // Animations
-  --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  // Animations - De las nuevas (más completas)
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  // HUD Grid System - De las nuevas
+  --grid-size: 8px;
+  --hud-padding: calc(var(--grid-size) * 3);
+  
+  // Particle Effects - De las nuevas
+  --particle-color: var(--neon-primary);
+  --particle-glow: rgba(0, 255, 255, 0.6);
 }
 
-// Breakpoints
+// Breakpoints - Fusionados (nuevas + 'wide' de antiguas)
 $breakpoints: (
   'mobile': 768px,
   'tablet': 1024px,
   'desktop': 1200px,
-  'wide': 1400px
+  'wide': 1400px, // De antiguas
+  'ultra-wide': 1600px // De nuevas
 );
 
-// Z-Index Scale
+// Z-Index Scale - Fusionados (nuevas + únicas de antiguas)
 $z-indexes: (
+  'background': -1,
   'base': 0,
-  'dropdown': 100,
-  'sticky': 200,
-  'fixed': 300,
+  'particles': 1,
+  'content': 10,
+  'sidebar': 100,
+  'dropdown': 100, // De antiguas
+  'sticky': 200, // De antiguas
+  'fixed': 300, // De antiguas
   'modal-backdrop': 400,
   'modal': 500,
-  'popover': 600,
-  'tooltip': 700,
+  'hud': 600,
+  'popover': 600, // De antiguas
+  'tooltip': 700, // De antiguas
   'toast': 800,
-  'system': 900
+  'system': 1000 // De nuevas, mayor que antiguas
 );
 
-// Animation Durations
+// Animation Durations - Fusionados (nuevas + extras de antiguas)
 $durations: (
-  'fast': 150ms,
-  'normal': 300ms,
-  'slow': 500ms,
-  'extra-slow': 800ms
+  'instant': 100ms,
+  'fast': 200ms,
+  'normal': 400ms,
+  'slow': 600ms,
+  'ultra-slow': 1000ms,
+  'extra-slow': 800ms // De antiguas
 );
 
-// Glassmorphism Settings
-$glass-blur: 12px;
-$glass-opacity: 0.1;
-$glass-border: rgba(255, 255, 255, 0.2);
+// Holographic Effect Settings - De las nuevas, agregando legacy
+$holo-blur: 16px;
+$holo-opacity: 0.1;
+$holo-border: var(--glass-border);
+$holo-glow: var(--glass-border-glow);
+$glass-blur: 12px; // Legacy de antiguas
+$glass-opacity: 0.1; // Legacy
+$glass-border: rgba(255, 255, 255, 0.2); // Legacy
+
+// Neon Glow Intensities - De las nuevas
+$neon-intensities: (
+  'subtle': 0.3,
+  'normal': 0.6,
+  'strong': 1.0,
+  'extreme': 1.5
+);
