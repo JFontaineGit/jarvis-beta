@@ -2,9 +2,8 @@
 @use '../../../../styles/variables.scss' as *;
 
 .mic-fab-container {
-  @include flex-column-center;
+  @include flex-center;
   position: relative;
-  gap: var(--space-md);
 }
 
 .manual-input-overlay {
@@ -13,7 +12,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
   @include flex-center;
   z-index: z('modal');
   animation: fadeIn var(--transition-fast) ease;
@@ -21,33 +21,38 @@
 
 .manual-input-modal {
   @include holographic-glass('strong');
-  border-radius: var(--radius-md);
-  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
   width: 90%;
-  max-width: 400px;
+  max-width: 500px;
   animation: slideUp var(--transition-normal) ease;
+  box-shadow: 0 0 40px rgba(var(--neon-primary), 0.3);
   
   h3 {
-    margin: 0 0 var(--space-md) 0;
+    margin: 0 0 var(--space-lg) 0;
     color: var(--text-primary);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
+    font-family: var(--font-primary);
+    letter-spacing: 1px;
     @include neon-glow(var(--text-primary), 'subtle');
   }
   
   textarea {
     width: 100%;
-    min-height: 80px;
-    padding: var(--space-sm);
+    min-height: 100px;
+    padding: var(--space-md);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-md);
     background: var(--glass-primary);
     color: var(--text-primary);
-    font-family: inherit;
-    font-size: 14px;
+    font-family: var(--font-secondary);
+    font-size: 15px;
+    line-height: 1.6;
     resize: vertical;
     outline: none;
     transition: all var(--transition-normal);
+    @include holo-scrollbar(6px);
     
     &:focus {
       border-color: var(--neon-primary);
@@ -56,29 +61,60 @@
     
     &::placeholder {
       color: var(--text-muted);
+      opacity: 0.6;
     }
+  }
+  
+  .char-count {
+    text-align: right;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    margin-top: var(--space-xs);
   }
   
   .modal-buttons {
     @include flex-between;
-    gap: var(--space-sm);
-    margin-top: var(--space-md);
-    justify-content: flex-end;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
     
     button {
-      @include holo-button('primary'); // Usando mixin para botón holográfico
+      flex: 1;
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
+      font-family: var(--font-primary);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      border: 1px solid var(--glass-border);
       
       &.btn-cancel {
-        @include holo-button('secondary');
+        @include holographic-glass();
+        color: var(--text-secondary);
+        
+        &:hover {
+          background: var(--glass-secondary);
+          color: var(--text-primary);
+          @include float-card(2px);
+        }
       }
       
       &.btn-send {
+        background: var(--neon-primary);
+        border-color: var(--neon-primary);
+        color: var(--text-primary);
+        @include neon-box(var(--neon-primary), 'normal');
+        
         &:hover:not(:disabled) {
+          @include float-card(3px);
           @include neon-box(var(--neon-primary), 'strong');
         }
         
         &:disabled {
-          opacity: 0.5;
+          opacity: 0.4;
           cursor: not-allowed;
         }
       }
@@ -86,9 +122,9 @@
   }
 }
 
-.fab-buttons {
+.fab-wrapper {
   @include flex-column-center;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .fab-button {
@@ -99,17 +135,11 @@
   @include flex-center;
   transition: all var(--transition-normal);
   outline: none;
-  overflow: hidden;
-  
-  svg {
-    stroke-width: 2;
-    transition: all var(--transition-normal);
-  }
+  overflow: visible;
   
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none !important;
   }
   
   &:not(:disabled):active {
@@ -117,42 +147,32 @@
   }
 }
 
-.secondary-fab {
-  width: 48px;
-  height: 48px;
-  @include holographic-glass();
-  border: 1px solid var(--glass-border);
-  color: var(--text-secondary);
-  
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-  
-  &:hover:not(:disabled) {
-    @include float-card(2px);
-    color: var(--text-primary);
-  }
-}
-
 .main-fab {
-  width: 72px;
-  height: 72px;
-  background: var(--neon-primary);
+  width: 80px;
+  height: 80px;
+  background: rgba(var(--neon-primary), 0.2);
+  border: 2px solid var(--neon-primary);
   color: var(--text-primary);
   @include neon-box(var(--neon-primary), 'normal');
+  backdrop-filter: blur(10px);
   
   .mic-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
+    stroke-width: 2;
     z-index: z('base');
+    filter: drop-shadow(0 0 6px var(--neon-primary));
+  }
+  
+  .mic-fill-icon {
+    display: none;
   }
   
   .processing-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid var(--text-primary);
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: 3px solid var(--neon-primary);
     border-radius: var(--radius-full);
     animation: rotateHue duration('normal') linear infinite;
     z-index: z('base');
@@ -164,43 +184,119 @@
     height: 100%;
     border: 2px solid var(--neon-secondary);
     border-radius: var(--radius-full);
-    animation: pulseGlow duration('slow') ease-out infinite;
+    animation: rippleExpand 2s ease-out infinite;
     
     &.delay-1 {
-      animation-delay: 0.5s;
+      animation-delay: 0.7s;
     }
     
     &.delay-2 {
-      animation-delay: 1s;
+      animation-delay: 1.4s;
     }
   }
   
   &:hover:not(:disabled) {
-    @include float-card(3px);
+    transform: translateY(-4px);
     @include neon-box(var(--neon-primary), 'strong');
+    border-width: 3px;
   }
   
   &.listening {
-    background: var(--neon-secondary);
-    @include neon-box(var(--neon-secondary), 'normal');
-    animation: pulseGlow duration('slow') ease-in-out infinite;
+    background: rgba(var(--neon-secondary), 0.3);
+    border-color: var(--neon-secondary);
+    @include neon-box(var(--neon-secondary), 'strong');
+    animation: pulseGlow 1.5s ease-in-out infinite;
     
     .mic-icon {
-      animation: holoFlicker duration('normal') ease-in-out infinite;
-    }
-    
-    &:hover:not(:disabled) {
-      @include neon-box(var(--neon-secondary), 'strong');
+      animation: holoFlicker 1s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px var(--neon-secondary));
     }
   }
   
   &.processing {
-    background: var(--text-muted);
+    background: rgba(var(--text-muted), 0.2);
+    border-color: var(--text-muted);
     animation: holoFlicker duration('fast') ease-in-out infinite;
   }
 }
 
+.fab-label {
+  @include flex-center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-lg);
+  background: rgba(var(--neon-primary), 0.1);
+  border: 1px solid rgba(var(--neon-primary), 0.3);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(8px);
+  
+  .label-icon {
+    @include flex-center;
+    width: 20px;
+    height: 20px;
+    
+    svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 2;
+      color: var(--neon-primary);
+    }
+  }
+  
+  .label-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+}
+
+// Animations
+@keyframes rippleExpand {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 // Responsive
+@include respond(tablet) {
+  .main-fab {
+    width: 72px;
+    height: 72px;
+    
+    .mic-icon {
+      width: 28px;
+      height: 28px;
+    }
+  }
+}
+
 @include respond(mobile) {
   .main-fab {
     width: 64px;
@@ -210,20 +306,28 @@
       width: 24px;
       height: 24px;
     }
+    
+    .processing-spinner {
+      width: 24px;
+      height: 24px;
+      border-width: 2px;
+    }
   }
   
-  .secondary-fab {
-    width: 44px;
-    height: 44px;
+  .fab-label {
+    padding: var(--space-xs) var(--space-md);
     
-    svg {
-      width: 18px;
-      height: 18px;
+    .label-text {
+      font-size: 11px;
     }
   }
   
   .manual-input-modal {
-    padding: var(--space-md);
+    padding: var(--space-lg);
     margin: var(--space-md);
+    
+    h3 {
+      font-size: 18px;
+    }
   }
 }

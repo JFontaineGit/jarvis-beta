@@ -1,78 +1,101 @@
 <div class="jarvis-container">
+  <!-- Background grid pattern -->
+  <div class="grid-background"></div>
+  
   <!-- Background particles -->
   <div class="background-particles">
-    <div class="particle" *ngFor="let i of [1,2,3,4,5,6,7,8,9,10]"></div>
+    @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+      <div class="particle"></div>
+    }
   </div>
 
   <!-- Main Interface -->
   <div class="main-interface">
     
-    <!-- Animated Circle -->
+    <!-- Header Section -->
+    <div class="header-section">
+      <h1 class="system-title">SISTEMA ACTIVADO</h1>
+      <p class="welcome-text">Bienvenido, señor</p>
+    </div>
+    
+    <!-- Animated Circle Section -->
     <div class="circle-section" role="img" aria-label="JARVIS Voice Visualizer">
+      
+      <!-- Orbital rings with dots -->
+      <div class="orbital-container">
+        <div class="orbital-ring ring-outer">
+          @for (dot of [1,2,3,4,5,6,7,8]; track dot) {
+            <div class="orbital-dot" [style.--dot-index]="dot"></div>
+          }
+        </div>
+        <div class="orbital-ring ring-middle">
+          @for (dot of [1,2,3,4]; track dot) {
+            <div class="orbital-dot" [style.--dot-index]="dot"></div>
+          }
+        </div>
+      </div>
+
+      <!-- Main animated circle -->
       <app-animated-circle
         [volume]="volume"
         [isListening]="isListening"
         [isSpeaking]="isSpeaking">
       </app-animated-circle>
       
-      <!-- Status indicator -->
-      <div class="status-indicator" [attr.aria-live]="'polite'">
-        <span *ngIf="isListening" class="status-text listening">
-          Escuchando...
-        </span>
-        <span *ngIf="isSpeaking" class="status-text speaking">
-          Hablando...
-        </span>
-        <span *ngIf="isProcessing" class="status-text processing">
-          Procesando...
-        </span>
-        <span *ngIf="currentInterimText" class="interim-text">
-          {{ currentInterimText }}
-        </span>
-      </div>
+      <!-- Status indicator with interim text -->
+      @if (isListening || isSpeaking || isProcessing || currentInterimText) {
+        <div class="status-indicator" [attr.aria-live]="'polite'">
+          @if (isListening) {
+            <span class="status-text listening">Escuchando...</span>
+          }
+          @if (isSpeaking) {
+            <span class="status-text speaking">Hablando...</span>
+          }
+          @if (isProcessing) {
+            <span class="status-text processing">Procesando</span>
+          }
+          @if (currentInterimText) {
+            <span class="interim-text">{{ currentInterimText }}</span>
+          }
+        </div>
+      }
     </div>
-    
-    <!-- Conversation Area
-    <div class="conversation-section" role="log" aria-label="Conversation History">
-      <div class="messages-container">
-        <app-transcript-card
-          *ngFor="let message of messages; trackBy: trackByMessage"
-          [message]="message"
-          [isLatest]="message === messages[messages.length - 1]">
-        </app-transcript-card>
-      </div>
-      
-       Error display 
-      <div *ngIf="errorMessage" class="error-message" role="alert">
-        {{ errorMessage }}
-      </div>
-    </div>
-    -->
 
-    <!-- Controls -->
+    <!-- Footer Section -->
+    <div class="footer-section">
+      <h2 class="jarvis-title">J.A.R.V.I.S</h2>
+      <p class="jarvis-subtitle">JUST A RATHER VERY INTELLIGENT SYSTEM</p>
+      
+      <div class="system-info">
+        <div class="info-item">
+          <span class="info-icon">●</span>
+          <span class="info-text">SISTEMA OPERATIVO</span>
+        </div>
+        <div class="info-item">
+          <span class="info-icon">●</span>
+          <span class="info-text">CONEXIÓN ACTIVA</span>
+        </div>
+        <div class="info-item">
+          <span class="version-text">v1.0.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Microphone FAB -->
     <div class="controls-section">
-      <!-- Microphone FAB -->
       <app-mic-fab
         [isListening]="isListening"
         [isProcessing]="isProcessing"
         (toggle)="onMicToggle()"
         (manualInput)="onManualInput($event)">
       </app-mic-fab>
-      
-      <!-- Action buttons -->
-      <div class="action-buttons">
-        <button 
-          class="action-btn clear-btn"
-          (click)="clearConversation()"
-          [disabled]="isProcessing"
-          aria-label="Clear conversation">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
-            <line x1="10" y1="11" x2="10" y2="17"/>
-            <line x1="14" y1="11" x2="14" y2="17"/>
-          </svg>
-        </button>
-      </div>
     </div>
   </div>
+
+  <!-- Error display -->
+  @if (errorMessage) {
+    <div class="error-toast" role="alert">
+      {{ errorMessage }}
+    </div>
+  }
 </div>

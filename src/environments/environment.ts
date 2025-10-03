@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
   openRouterKeys: [
-    "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",
+    "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",
   ],
   elevenLabsKey: "sk_a9add047fa19833fd48b4db4449209a9424b433dbf3d325b",
   defaultVoiceId: "LruHrtVF6PSyGItzMNHS", 
