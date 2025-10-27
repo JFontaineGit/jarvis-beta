@@ -16,6 +16,7 @@ export class SpeechService {
   private audioContext: AudioContext | null = null;
   private analyser: AnalyserNode | null = null;
   private microphone: MediaStreamAudioSourceNode | null = null;
+  private mediaStream: MediaStream | null = null;
   private dataArray: any;
   private animationFrame: number | null = null;
 
@@ -149,7 +150,7 @@ export class SpeechService {
     }
   }
 
- private async startVolumeAnalysis(): Promise<void> {
+  private async startVolumeAnalysis(): Promise<void> {
     if (!isPlatformBrowser(this.platformId)) {
       console.warn('Volume analysis not supported on server');
       return;
@@ -157,10 +158,11 @@ export class SpeechService {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.mediaStream = stream;
       this.audioContext = new AudioContext();
       this.analyser = this.audioContext.createAnalyser();
       this.microphone = this.audioContext.createMediaStreamSource(stream);
-      
+
       this.analyser.fftSize = 256;
       const bufferLength = this.analyser.frequencyBinCount;
       this.dataArray = new Uint8Array(bufferLength);
@@ -170,6 +172,17 @@ export class SpeechService {
     } catch (error) {
       console.error('Error accessing microphone:', error);
       this.error.next('No se detectó micrófono. Verifique permisos.');
+      this.mediaStream?.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+      if (this.microphone) {
+        this.microphone.disconnect();
+        this.microphone = null;
+      }
+      if (this.audioContext && this.audioContext.state !== 'closed') {
+        this.audioContext.close();
+      }
+      this.audioContext = null;
+      this.analyser = null;
     }
   }
 
@@ -196,15 +209,24 @@ export class SpeechService {
     if (this.animationFrame) {
       cancelAnimationFrame(this.animationFrame);
     }
-    
+
     if (this.microphone) {
       this.microphone.disconnect();
+      this.microphone = null;
     }
-    
+
     if (this.audioContext && this.audioContext.state !== 'closed') {
       this.audioContext.close();
     }
-    
+
+    this.audioContext = null;
+    this.analyser = null;
+
+    if (this.mediaStream) {
+      this.mediaStream.getTracks().forEach(track => track.stop());
+      this.mediaStream = null;
+    }
+
     this.volumeLevel$.next(0);
   }
 
