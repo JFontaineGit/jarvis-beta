@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, isObservable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { OpenRouterService } from './openrouter.service';
 import { Message } from '../../../models/message.interface';
+import { WeatherService } from './weather.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,17 +11,20 @@ import { Message } from '../../../models/message.interface';
 export class IntentRouterService {
   private tools: Map<string, any> = new Map();
 
-  constructor(private openRouterService: OpenRouterService) {
+  constructor(
+    private openRouterService: OpenRouterService,
+    private weatherService: WeatherService
+  ) {
     this.initializeTools();
   }
 
   processMessage(message: string): Observable<Message> {
     const intent = this.detectIntent(message.toLowerCase());
-    
+
     if (intent && this.tools.has(intent)) {
       return this.executeLocal(intent, message);
     }
-    
+
     // Default to OpenRouter for general conversation
     return this.openRouterService.sendMessage(message);
   }
@@ -53,14 +58,23 @@ export class IntentRouterService {
   private executeLocal(intent: string, message: string): Observable<Message> {
     const tool = this.tools.get(intent);
     if (tool) {
-      const result = tool.execute(message);
-      const response: Message = {
+      const result: string | Observable<string> | Promise<string> = tool.execute(message);
+      const createResponse = (content: string): Message => ({
         id: `local_${Date.now()}`,
         role: 'assistant',
-        content: result,
+        content: typeof content === 'string' ? content : JSON.stringify(content),
         timestamp: new Date()
-      };
-      return of(response);
+      });
+
+      if (isObservable(result)) {
+        return result.pipe(map(response => createResponse(response)));
+      }
+
+      if (result instanceof Promise) {
+        return from(result).pipe(map(response => createResponse(response)));
+      }
+
+      return of(createResponse(result));
     }
 
     return this.openRouterService.sendMessage(message);
@@ -92,11 +106,9 @@ export class IntentRouterService {
       }
     });
 
-    // Weather tool (placeholder)
+    // Weather tool using MCP integration
     this.tools.set('weather', {
-      execute: (message: string) => {
-        return 'Lo siento, la función del clima aún no está disponible. ¿Puedo ayudarte con algo más?';
-      }
+      execute: (message: string) => this.weatherService.getWeather(message)
     });
   }
 

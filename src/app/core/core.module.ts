@@ -7,6 +7,7 @@ import { ApiService } from './services/api.service';
 import { OpenRouterService } from './services/openrouter.service';
 import { ElevenLabsService } from './services/elevenlabs.service';
 import { IntentRouterService } from './services/intent-router.service';
+import { WeatherService } from './services/weather.service';
 
 @NgModule({
   imports: [
@@ -18,7 +19,8 @@ import { IntentRouterService } from './services/intent-router.service';
     ApiService,
     OpenRouterService,
     ElevenLabsService,
-    IntentRouterService
+    IntentRouterService,
+    WeatherService
   ]
 })
 export class CoreModule {
